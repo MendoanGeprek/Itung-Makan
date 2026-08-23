@@ -31,7 +31,7 @@ function CopyButton({ amount, label }) {
   )
 }
 
-export default function ResultsTable({ result, payerId }) {
+export default function ResultsTable({ result }) {
   const methodLabel = result.method === 'proportional' ? 'Proporsional Penuh' : '50/50'
 
   return (
@@ -45,10 +45,7 @@ export default function ResultsTable({ result, payerId }) {
       <Rule />
 
       <ul className="py-1">
-        {result.rows.map((row, index) => {
-          const isPayer = row.id === payerId
-
-          return (
+        {result.rows.map((row, index) => (
             <li key={row.id} className="py-3">
               <div className="flex items-baseline gap-2">
                 <span aria-hidden="true" className="text-faint shrink-0 text-xs tabular-nums">
@@ -57,7 +54,7 @@ export default function ResultsTable({ result, payerId }) {
                 <span className="text-ink min-w-0 flex-1 truncate text-sm font-bold">
                   {row.name}
                 </span>
-                {!isPayer && <CopyButton amount={row.transferReady} label={row.name} />}
+                <CopyButton amount={row.transferReady} label={row.name} />
               </div>
 
               <div className="mt-1.5 pl-8 text-[11px]">
@@ -66,15 +63,10 @@ export default function ResultsTable({ result, payerId }) {
               </div>
 
               <div className="mt-1.5 pl-8 text-sm">
-                {isPayer ? (
-                  <LeaderLine bold label="TALANGIN" value="menerima transfer" />
-                ) : (
-                  <LeaderLine bold label="TRANSFER" value={formatRupiah(row.transferReady)} />
-                )}
+                <LeaderLine bold label="TRANSFER" value={formatRupiah(row.transferReady)} />
               </div>
             </li>
-          )
-        })}
+        ))}
       </ul>
 
       <DoubleRule />

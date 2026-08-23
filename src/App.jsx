@@ -36,7 +36,6 @@ export default function App() {
   const [netPaid, setNetPaid] = useState(0)
   const [people, setPeople] = useState(initialPeople)
   const [method, setMethod] = useState('even')
-  const [payerId, setPayerId] = useState('')
   const [hasCalculated, setHasCalculated] = useState(false)
   const [comparisonOpen, setComparisonOpen] = useState(false)
   const [themeChoice, setThemeChoice] = useState(readStoredChoice)
@@ -62,8 +61,8 @@ export default function App() {
   }, [themeChoice])
 
   const result = useMemo(
-    () => computeSplit({ grossTotal, netPaid, people, method, payerId: payerId || null }),
-    [grossTotal, netPaid, people, method, payerId],
+    () => computeSplit({ grossTotal, netPaid, people, method }),
+    [grossTotal, netPaid, people, method],
   )
 
   const addPerson = () =>
@@ -71,8 +70,6 @@ export default function App() {
 
   const removePerson = (id) => {
     if (people.length <= 1) return
-    // Kalau si penalang yang dihapus, pilihannya ikut dikosongkan.
-    if (id === payerId) setPayerId('')
     setPeople((prev) => prev.filter((person) => person.id !== id))
   }
 
@@ -94,7 +91,6 @@ export default function App() {
     setNetPaid(0)
     setPeople(initialPeople())
     setMethod('even')
-    setPayerId('')
     setHasCalculated(false)
     setComparisonOpen(false)
   }
@@ -158,24 +154,6 @@ export default function App() {
               + tambah orang
             </button>
 
-            <div className="flex flex-wrap items-center gap-2 py-4">
-              <label htmlFor="payer" className="text-[11px] font-bold tracking-wider uppercase">
-                Yang menalangi
-              </label>
-              <select
-                id="payer"
-                value={payerId}
-                onChange={(event) => setPayerId(event.target.value)}
-                className="bg-field border-edge text-ink min-w-0 flex-1 rounded border px-3 py-2 text-xs font-semibold transition outline-none focus:border-stone-500 focus:ring-1 focus:ring-stone-500/40"
-              >
-                <option value="">- belum ditentukan -</option>
-                {people.map((person) => (
-                  <option key={person.id} value={person.id}>
-                    {person.name}
-                  </option>
-                ))}
-              </select>
-            </div>
           </section>
 
           <Rule />
@@ -221,7 +199,7 @@ export default function App() {
                   </p>
                 ))}
 
-                <ResultsTable result={result} payerId={payerId} />
+                <ResultsTable result={result} />
 
                 <Rule />
 
