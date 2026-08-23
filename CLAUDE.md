@@ -58,19 +58,13 @@ Termasuk nama field: "Total Sebelum Diskon" (gross) dan "Total Setelah Diskon"
 
 ### Tambahan di luar spec
 
+- **Pemilih "Yang menalangi"** — karena pembulatan ke bawah selalu menyisakan
+  kekurangan, seseorang harus menanggungnya. Orang ini ditandai "menerima
+  transfer" alih-alih diberi nominal kirim.
 - **Metode bisa diganti** — panel pembanding bukan cuma menampilkan angka, tapi
   bisa dipakai mengganti metode aktif antara 50/50 dan Proporsional Penuh.
   Bawaannya tetap 50/50 sesuai spec.
 - **Dark mode** — pilihan Terang / Gelap / Sistem, tersimpan di `localStorage`.
-
-### Pernah ada, sudah dicabut
-
-Pemilih **"Yang menalangi"** sempat ada: satu orang ditandai penerima transfer
-alih-alih diberi nominal kirim, dan aplikasi menghitung berapa dia nombok akibat
-pembulatan. User meminta dihapus. Jangan dihidupkan lagi tanpa diminta.
-
-Sisa pembulatan tetap ditampilkan di rincian biaya, cuma tidak lagi dikaitkan ke
-orang tertentu.
 
 ## Struktur
 

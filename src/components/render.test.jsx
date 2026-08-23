@@ -39,12 +39,17 @@ describe('render awal', () => {
 
 describe('hasil sampai ke layar', () => {
   it('menampilkan nominal siap-transfer tiap orang', () => {
-    const html = render(<ResultsTable result={vector()} />)
+    const html = render(<ResultsTable result={vector()} payerId="" />)
     expect(html).toContain('Rp 62.500')
     expect(html).toContain('Rp 27.500')
     expect(html).toContain('cocok dengan total setelah diskon')
   })
 
+  it('menandai si penalang sebagai penerima, bukan pengirim', () => {
+    const html = render(<ResultsTable result={vector()} payerId="a" />)
+    expect(html).toContain('menerima transfer')
+    expect(html).toContain('Rp 27.500')
+  })
 
   it('merinci biaya tambahan dan diskon', () => {
     const html = render(<SummaryBar result={vector()} />)
@@ -64,7 +69,7 @@ describe('hasil sampai ke layar', () => {
   })
 
   it('mengikuti metode terpilih saat diganti ke proporsional', () => {
-    const html = render(<ResultsTable result={vector('proportional')} />)
+    const html = render(<ResultsTable result={vector('proportional')} payerId="" />)
     expect(html).toContain('Rp 67.500')
     expect(html).toContain('Rp 22.500')
     expect(html).toContain('Proporsional Penuh')
