@@ -16,7 +16,6 @@ Kalkulator patungan makanan yang membagi diskon dan biaya tambahan secara adil. 
   - **Proporsional penuh:** biaya tambahan mengikuti porsi harga pesanan.
 - Membandingkan hasil kedua metode sebelum memilih.
 - Membulatkan nominal transfer ke bawah pada kelipatan Rp100 dan menampilkan sisanya.
-- Menentukan orang yang menalangi pembayaran dan jumlah transfer yang perlu diterima.
 - Menangani jumlah peserta secara dinamis.
 - Tema terang, gelap, atau mengikuti sistem.
 - Antarmuka responsif bergaya struk belanja.
@@ -166,7 +165,7 @@ Test mencakup:
 - penyimpanan serta penerapan tema;
 - render hasil perhitungan pada komponen UI.
 
-Saat README ini dibuat, seluruh **29 test** lulus.
+Saat README ini dibuat, seluruh **28 test** lulus.
 
 ## Struktur proyek
 
