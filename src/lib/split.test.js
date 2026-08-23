@@ -46,7 +46,7 @@ describe('computeSplit — pesanan tidak seimbang', () => {
     expect(b.delta).toBeCloseTo(-5000, 6)
   })
 
-  it('menjumlah persis ke total dibayar pada kedua metode', () => {
+  it('menjumlah persis ke total setelah diskon pada kedua metode', () => {
     const sumEven = result.rows.reduce((t, r) => t + r.exactEven, 0)
     const sumProportional = result.rows.reduce((t, r) => t + r.exactProportional, 0)
     expect(sumEven).toBeCloseTo(90000, 6)

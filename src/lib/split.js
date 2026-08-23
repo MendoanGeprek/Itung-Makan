@@ -102,14 +102,14 @@ export function computeSplit({
     warnings.push({
       level: 'warn',
       message:
-        'Total dibayar melebihi total sebelum diskon — selisihnya dihitung sebagai biaya tambahan, bukan diskon.',
+        'Total setelah diskon melebihi total sebelum diskon — selisihnya dihitung sebagai biaya tambahan, bukan diskon.',
     })
   }
   if (discountRatio < 0) {
     warnings.push({
       level: 'warn',
       message:
-        'Total dibayar lebih kecil daripada biaya tambahan — kemungkinan angka gross dan net tertukar.',
+        'Total setelah diskon lebih kecil daripada biaya tambahan — kemungkinan angka gross dan net tertukar.',
     })
   }
 
@@ -167,7 +167,7 @@ export function computeSplit({
       exact: totalExact,
       transferReady: totalTransferReady,
       remainder: net - totalTransferReady,
-      // Secara aljabar jumlah nominal persis SELALU sama dengan total dibayar.
+      // Secara aljabar jumlah nominal persis SELALU sama dengan total setelah diskon.
       // Cek ini murni jaring pengaman terhadap galat floating point.
       matchesNetPaid: Math.abs(totalExact - net) < 0.01,
     },

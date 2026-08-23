@@ -7,7 +7,33 @@
       name="description"
       content="Kalkulator patungan makanan yang adil: memisahkan diskon proporsional dari biaya tambahan."
     />
-    <title>Itung Makan — Patungan Adil</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <title>Itung Makan - Patungan Adil</title>
+    <script>
+      /*
+       * Tema diterapkan sebelum React sempat menggambar apa pun. Tanpa ini,
+       * pengguna mode gelap akan melihat kedipan terang di setiap muat ulang.
+       */
+      (function () {
+        try {
+          var stored = window.localStorage.getItem('itung-makan-theme')
+          var resolved =
+            stored === 'light' || stored === 'dark'
+              ? stored
+              : window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? 'dark'
+                : 'light'
+          document.documentElement.setAttribute('data-theme', resolved)
+        } catch (error) {
+          document.documentElement.setAttribute('data-theme', 'light')
+        }
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>
