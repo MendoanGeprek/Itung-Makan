@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { computeSplit } from './lib/split'
 import { applyTheme, readStoredChoice, storeChoice } from './lib/theme'
+import { syncNativeChrome } from './lib/native'
 import BillInputs from './components/BillInputs'
 import ComparisonPanel from './components/ComparisonPanel'
 import PersonRow from './components/PersonRow'
@@ -45,8 +46,9 @@ export default function App() {
 
   // Terapkan dan simpan pilihan tema setiap kali berubah.
   useEffect(() => {
-    applyTheme(themeChoice)
+    const resolved = applyTheme(themeChoice)
     storeChoice(themeChoice)
+    syncNativeChrome(resolved)
   }, [themeChoice])
 
   // Saat memilih 'Sistem', tampilan harus ikut berubah kalau setelan OS
@@ -54,7 +56,7 @@ export default function App() {
   useEffect(() => {
     if (themeChoice !== 'system' || typeof window.matchMedia !== 'function') return
     const query = window.matchMedia('(prefers-color-scheme: dark)')
-    const sync = () => applyTheme('system')
+    const sync = () => syncNativeChrome(applyTheme('system'))
     query.addEventListener('change', sync)
     return () => query.removeEventListener('change', sync)
   }, [themeChoice])

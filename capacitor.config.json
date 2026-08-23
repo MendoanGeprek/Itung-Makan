@@ -1,0 +1,15 @@
+{
+  "appId": "com.mendoangeprek.itungmakan",
+  "appName": "Itung Makan",
+  "webDir": "dist",
+  "android": {
+    "backgroundColor": "#C8BDA9"
+  },
+  "plugins": {
+    "StatusBar": {
+      "overlaysWebView": false,
+      "style": "DEFAULT",
+      "backgroundColor": "#C8BDA9"
+    }
+  }
+}

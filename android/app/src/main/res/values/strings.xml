@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Itung Makan</string>
+    <string name="title_activity_main">Itung Makan</string>
+    <string name="package_name">com.mendoangeprek.itungmakan</string>
+    <string name="custom_url_scheme">com.mendoangeprek.itungmakan</string>
+</resources>

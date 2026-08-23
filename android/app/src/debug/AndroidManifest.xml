@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Hanya berlaku untuk varian debug. Live reload menyajikan aplikasi lewat HTTP
+  polos dari dev server di komputer, dan Android memblokir itu secara bawaan.
+
+  Varian release TIDAK terpengaruh berkas ini, jadi APK yang dibagikan tetap
+  menolak lalu lintas tidak terenkripsi.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <application
+        android:usesCleartextTraffic="true"
+        tools:replace="android:usesCleartextTraffic" />
+
+</manifest>
