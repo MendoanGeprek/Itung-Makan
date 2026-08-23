@@ -1,6 +1,44 @@
 @import 'tailwindcss';
 
 /*
+ * Font dibungkus ke dalam aplikasi, bukan diambil dari Google Fonts.
+ * Alasannya APK Android: kalkulator patungan justru sering dipakai saat sinyal
+ * seret, dan aplikasi terpasang tidak seharusnya mengunduh font tiap dibuka.
+ * Hanya subset latin, empat bobot yang benar-benar dipakai. Total 59 kB.
+ */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./assets/fonts/ibm-plex-mono-400.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('./assets/fonts/ibm-plex-mono-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('./assets/fonts/ibm-plex-mono-600.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('./assets/fonts/ibm-plex-mono-700.woff2') format('woff2');
+}
+
+/*
  * Varian `dark:` dialihkan dari media query ke atribut supaya pilihan user
  * bisa mengalahkan setelan sistem. JS menerjemahkan 'system' jadi nilai
  * konkret sebelum menaruhnya di <html data-theme>.

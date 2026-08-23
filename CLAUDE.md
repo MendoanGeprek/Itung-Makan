@@ -99,6 +99,13 @@ berganti saat tema diubah, tanpa perlu menulis pasangan `dark:` di tiap
 komponen. Kalau menambah warna baru, ikuti pola ini — jangan kembali menulis
 `dark:` manual.
 
+Font IBM Plex Mono dibungkus ke dalam proyek di `src/assets/fonts/`, bukan
+diambil dari Google Fonts, supaya APK Android tetap benar tampilannya tanpa
+internet. Hanya subset latin dan empat bobot yang dipakai (400, 500, 600, 700),
+total 59 kB. Kalau menambah kelas bobot lain seperti `font-extrabold`, bobotnya
+belum ada — peramban akan memalsukannya dan hasilnya jelek. Unduh dulu bobot itu
+dan tambahkan blok `@font-face`-nya.
+
 Varian `dark:` sengaja dialihkan dari `prefers-color-scheme` ke atribut
 `[data-theme='dark']`, supaya pilihan manual user bisa mengalahkan setelan
 sistem. Ada skrip kecil di `<head>` yang menerapkan tema sebelum React
@@ -147,3 +154,54 @@ Jangan hilangkan pagar-pagar ini saat menyunting `split.js`:
 | `extraFees` negatif | Tetap hitung, munculkan peringatan |
 | `discountRatio` > 1 atau < 0 | Tetap hitung, munculkan peringatan |
 | input kosong / non-angka | Diperlakukan sebagai 0, tidak pernah `NaN` |
+
+## Aplikasi Android
+
+Dibungkus dengan Capacitor: kode web yang sama persis dijalankan di dalam
+WebView native. Tidak ada kode UI terpisah untuk Android.
+
+- `appId` = `com.mendoangeprek.itungmakan`. Jangan diubah setelah dipublikasikan
+  ke Play Store, karena itu identitas permanen aplikasinya di sana.
+- Ikon dan layar pembuka dihasilkan dari `assets/icon-source.svg`. Kalau
+  ikonnya diubah, jalankan ulang `npm run android:icons` supaya semua
+  kerapatan layar ikut diperbarui, jangan menyunting berkas di `res/` satu per
+  satu.
+- `src/lib/native.js` menyamakan warna bilah status dengan tema. Impor
+  Capacitor di sana sengaja dinamis supaya tidak ikut masuk bundel web.
+
+### Menjalankan ke HP lewat kabel
+
+```
+npm run android:run     # pasang versi mandiri, jalan tanpa komputer
+npm run android:live     # live reload; jalankan `npm run dev` dulu di terminal lain
+npm run android:sync     # cuma build + salin, tanpa memasang
+npm run android:open     # buka di Android Studio
+```
+
+**Jangan pakai `npx cap run android` di Windows.** Capacitor CLI memanggil
+`./gradlew` — skrip shell Unix — tanpa memeriksa sistem operasi, jadi selalu
+gagal dengan "'gradlew' is not recognized". Pindah ke Git Bash tidak menolong
+karena Node tetap memakai `cmd.exe` untuk spawn. `scripts/android.mjs`
+menggantikannya dengan memanggil `gradlew.bat` langsung, sekaligus mengurus
+`adb reverse`, pemasangan, dan peluncuran.
+
+Mode `live` mencari dev server di porta 5173-5177, bukan mengasumsikan 5173,
+karena Vite bergeser ke porta berikutnya kalau yang pertama terpakai. Paksa
+dengan `DEV_PORT=<porta>` kalau perlu. Setelah sync, `capacitor.config.json`
+selalu dikembalikan ke isi asli supaya alamat dev server tidak ikut ter-commit.
+
+`android/app/src/debug/AndroidManifest.xml` mengizinkan HTTP polos **hanya untuk
+varian debug**, karena live reload berjalan tanpa TLS. Jangan pindahkan flag itu
+ke manifest utama — build release harus tetap menolak lalu lintas tidak
+terenkripsi.
+
+Prasyarat sekali seumur mesin: `JAVA_HOME` menunjuk ke `jbr/` milik Android
+Studio, `ANDROID_HOME` ke folder SDK. Setelah menyetelnya, tutup dan buka ulang
+VS Code.
+
+APK hasil build ada di `android/app/build/outputs/apk/debug/app-debug.apk`.
+
+APK debug sudah bisa dipasang dan dibagikan, tapi ditandatangani kunci debug
+bawaan sehingga tidak bisa diunggah ke Play Store. Untuk itu perlu
+`assembleRelease` dengan keystore sendiri. Keystore JANGAN pernah di-commit,
+sudah masuk `.gitignore`.
