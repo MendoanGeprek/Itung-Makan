@@ -1,5 +1,18 @@
 apply plugin: 'com.android.application'
 
+/*
+ * Kredensial penandatanganan dibaca dari keystore.properties yang TIDAK
+ * di-commit. Kalau berkasnya tidak ada, build release tetap berjalan tapi
+ * menghasilkan APK tak tertandatangan -- ini disengaja supaya orang lain bisa
+ * meng-clone dan membangun debug tanpa perlu kunci milikmu.
+ */
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+def hasSigningConfig = keystorePropertiesFile.exists()
+if (hasSigningConfig) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
 android {
     namespace = "com.mendoangeprek.itungmakan"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -16,10 +29,28 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        if (hasSigningConfig) {
+            release {
+                // rootProject, bukan file(): di dalam modul app, file() menunjuk
+                // ke android/app/ sedangkan keystore-nya ada di android/.
+                storeFile rootProject.file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+            }
+        }
+    }
     buildTypes {
         release {
+            // R8 dibiarkan mati mengikuti bawaan Capacitor. Menyalakannya tanpa
+            // aturan proguard yang benar bisa membuang kelas yang dipanggil
+            // lewat jembatan JavaScript, dan gagalnya cuma terlihat saat jalan.
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            if (hasSigningConfig) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 }
