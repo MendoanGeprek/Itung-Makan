@@ -22,7 +22,7 @@ export default function BillInputs({ grossTotal, netPaid, onGrossChange, onNetCh
         <Field
           id="gross-total"
           label="Total Sebelum Diskon"
-          hint="Angka di struk sebelum promo dipotong, sudah termasuk ongkir dan biaya layanan."
+          hint="Total harga sebelum dipotong diskon, termasuk ongkir dan biaya layanan."
           value={grossTotal}
           onChange={onGrossChange}
         />

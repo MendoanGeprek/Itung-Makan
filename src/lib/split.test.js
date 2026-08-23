@@ -83,17 +83,9 @@ describe('computeSplit — sisa pembulatan', () => {
     expect(result.totals.remainder).toBe(100)
   })
 
-  it('menghitung berapa yang ditanggung si penalang', () => {
-    const withPayer = computeSplit({
-      grossTotal: 100000,
-      netPaid: 90000,
-      people: [person('a', 'User A', 55000), person('b', 'User B', 25000)],
-      payerId: 'a',
-    })
-    expect(withPayer.payer.name).toBe('User A')
-    expect(withPayer.payer.collects).toBe(31800)
-    expect(withPayer.payer.pays).toBe(58200)
-    expect(withPayer.payer.absorbs).toBeCloseTo(75, 6)
+  it('menjumlahkan kekurangan tiap orang menjadi sisa total', () => {
+    const hilang = result.rows.reduce((total, row) => total + (row.exact - row.transferReady), 0)
+    expect(hilang).toBeCloseTo(result.totals.remainder, 6)
   })
 })
 

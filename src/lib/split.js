@@ -27,14 +27,12 @@ export function roundDownTo(value, step = ROUNDING_STEP) {
  * @param {number} args.netPaid     Nominal yang benar-benar dibayar.
  * @param {Array<{id: string, name: string, food: number}>} args.people
  * @param {'even'|'proportional'} [args.method]  Cara membagi biaya tambahan.
- * @param {string|null} [args.payerId]  Siapa yang menalangi tagihan.
  */
 export function computeSplit({
   grossTotal = 0,
   netPaid = 0,
   people = [],
   method = 'even',
-  payerId = null,
 } = {}) {
   const gross = toFinite(grossTotal)
   const net = toFinite(netPaid)
@@ -82,7 +80,6 @@ export function computeSplit({
         transferReady: 0,
       })),
       totals: { exact: 0, transferReady: 0, remainder: 0, matchesNetPaid: false },
-      payer: null,
       warnings,
     }
   }
@@ -136,24 +133,6 @@ export function computeSplit({
   const totalExact = rows.reduce((total, row) => total + row.exact, 0)
   const totalTransferReady = rows.reduce((total, row) => total + row.transferReady, 0)
 
-  // Kalau ada yang menalangi, dia tidak transfer — dia yang menerima.
-  let payer = null
-  const payerRow = rows.find((row) => row.id === payerId)
-  if (payerRow) {
-    const collects = rows
-      .filter((row) => row.id !== payerRow.id)
-      .reduce((total, row) => total + row.transferReady, 0)
-    const pays = net - collects
-    payer = {
-      id: payerRow.id,
-      name: payerRow.name,
-      collects,
-      pays,
-      fairShare: payerRow.exact,
-      absorbs: pays - payerRow.exact,
-    }
-  }
-
   return {
     valid: true,
     method,
@@ -171,7 +150,6 @@ export function computeSplit({
       // Cek ini murni jaring pengaman terhadap galat floating point.
       matchesNetPaid: Math.abs(totalExact - net) < 0.01,
     },
-    payer,
     warnings,
   }
 }
