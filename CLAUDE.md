@@ -201,7 +201,35 @@ VS Code.
 
 APK hasil build ada di `android/app/build/outputs/apk/debug/app-debug.apk`.
 
-APK debug sudah bisa dipasang dan dibagikan, tapi ditandatangani kunci debug
-bawaan sehingga tidak bisa diunggah ke Play Store. Untuk itu perlu
-`assembleRelease` dengan keystore sendiri. Keystore JANGAN pernah di-commit,
-sudah masuk `.gitignore`.
+### APK release untuk dibagikan langsung
+
+```
+npm run android:release
+```
+
+Menghasilkan `android/app/build/outputs/apk/release/app-release.apk`, sekitar
+3,3 MB — 28% lebih kecil dari debug, tanpa penanda `debuggable` maupun izin
+HTTP polos. Kalau ada HP tersambung, langsung dipasang sekalian; kalau tidak,
+berkasnya tinggal disalin ke HP dan dibuka dari sana.
+
+Penandatanganan dibaca dari `android/keystore.properties`, yang menunjuk
+`android/itung-makan.keystore`. **Keduanya tidak pernah di-commit** dan harus
+dicadangkan sendiri. Kalau hilang, pembaruan berikutnya tidak bisa menimpa
+pemasangan yang sudah ada — penggunanya harus mencopot aplikasi lama dulu.
+
+Kalau `keystore.properties` tidak ada, build release tetap berjalan tapi
+menghasilkan APK tak tertandatangan. Ini disengaja supaya orang lain bisa
+meng-clone repo dan membangun versi debug tanpa perlu kunci milikmu.
+
+Dua jebakan yang sudah kena sekali:
+
+- Di dalam modul `app`, `file()` menunjuk ke `android/app/`, bukan `android/`.
+  Jalur keystore memakai `rootProject.file()`.
+- Tanda tangan release berbeda dari debug, jadi Android menolak menimpa
+  pemasangan debug yang sudah ada. Skripnya mendeteksi
+  `INSTALL_FAILED_UPDATE_INCOMPATIBLE` lalu mencopot versi lama dan memasang
+  ulang.
+
+R8 sengaja dibiarkan mati mengikuti bawaan Capacitor. Menyalakannya tanpa aturan
+proguard yang benar bisa membuang kelas yang cuma dipanggil lewat jembatan
+JavaScript, dan gagalnya baru terlihat saat aplikasi dijalankan.

@@ -7,12 +7,13 @@
  * Skrip ini memanggil `gradlew.bat` secara langsung.
  *
  * Pemakaian:
- *   node scripts/android.mjs run     pasang versi terbangun ke HP
- *   node scripts/android.mjs live    pasang versi yang menunjuk dev server
+ *   node scripts/android.mjs run      pasang versi debug ke HP
+ *   node scripts/android.mjs live     pasang versi yang menunjuk dev server
+ *   node scripts/android.mjs release  rakit APK release tertandatangan
  */
 
 import { spawnSync } from 'node:child_process'
-import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import process from 'node:process'
 
@@ -24,8 +25,8 @@ const CONFIG = join(ROOT, 'capacitor.config.json')
 const PORT_RANGE = [5173, 5174, 5175, 5176, 5177]
 
 const mode = process.argv[2] ?? 'run'
-if (!['run', 'live'].includes(mode)) {
-  fail(`Mode tidak dikenal: ${mode}. Pakai "run" atau "live".`)
+if (!['run', 'live', 'release'].includes(mode)) {
+  fail(`Mode tidak dikenal: ${mode}. Pakai "run", "live", atau "release".`)
 }
 
 function fail(message) {
@@ -96,7 +97,7 @@ const devices = captureExe(adb, ['devices'])
   .filter((line) => line.endsWith('\tdevice'))
   .map((line) => line.split('\t')[0])
 
-if (devices.length === 0) {
+if (devices.length === 0 && mode !== 'release') {
   const unauthorized = captureExe(adb, ['devices']).includes('unauthorized')
   fail(
     unauthorized
@@ -105,8 +106,12 @@ if (devices.length === 0) {
           '  Nyalakan USB debugging di Opsi Pengembang, lalu colok kabelnya.',
   )
 }
-const target = devices[0]
-console.log(`\n  HP: ${target}${devices.length > 1 ? `  (dari ${devices.length}, dipakai yang pertama)` : ''}`)
+const target = devices[0] ?? null
+console.log(
+  target
+    ? `\n  HP: ${target}${devices.length > 1 ? `  (dari ${devices.length}, dipakai yang pertama)` : ''}`
+    : '\n  Tidak ada HP tersambung. APK tetap dirakit, tinggal disalin manual ke HP.',
+)
 
 // --- Siapkan aset ------------------------------------------------------------
 
@@ -158,8 +163,13 @@ try {
     runShell('npx cap sync android')
   }
 
-  step('Membangun dan memasang APK')
-  runShell(`"${gradlew}" installDebug --no-daemon`, { cwd: join(ROOT, 'android') })
+  if (mode === 'release') {
+    step('Merakit APK release tertandatangan')
+    runShell(`"${gradlew}" assembleRelease --no-daemon`, { cwd: join(ROOT, 'android') })
+  } else {
+    step('Membangun dan memasang APK debug')
+    runShell(`"${gradlew}" installDebug --no-daemon`, { cwd: join(ROOT, 'android') })
+  }
 } finally {
   // Konfigurasi asli dikembalikan apa pun yang terjadi, supaya repo tidak
   // ketinggalan alamat dev server yang cuma berlaku sesaat.
@@ -169,12 +179,46 @@ try {
 // --- Jalankan ----------------------------------------------------------------
 
 const appId = JSON.parse(originalConfig).appId
-step('Membuka aplikasi')
-runExe(adb, ['-s', target, 'shell', 'am', 'start', '-n', `${appId}/.MainActivity`])
 
-console.log(
-  mode === 'live'
-    ? '\n  Siap. Ubah kode, tampilan di HP ikut berubah tanpa build ulang.\n' +
-        '  Kalau HP kehilangan sambungan, ulangi perintah ini.\n'
-    : '\n  Siap. Aplikasi berjalan dari aset yang terbungkus, tanpa perlu komputer.\n',
-)
+if (mode === 'release') {
+  const apk = join(ROOT, 'android', 'app', 'build', 'outputs', 'apk', 'release', 'app-release.apk')
+  if (!existsSync(apk)) fail('APK release tidak ditemukan setelah build.')
+
+  const mb = (statSync(apk).size / 1024 / 1024).toFixed(2)
+  console.log(`\n  APK siap dibagikan (${mb} MB):\n  ${apk}\n`)
+
+  if (target) {
+    // Tanda tangan release berbeda dari debug, jadi Android menolak menimpanya.
+    // Versi lama dicopot dulu; yang hilang cuma pilihan tema di localStorage.
+    step('Memasang ke HP')
+    const install = spawnSync(adb, ['-s', target, 'install', '-r', apk], { encoding: 'utf8' })
+    const output = (install.stdout ?? '') + (install.stderr ?? '')
+
+    if (output.includes('INSTALL_FAILED_UPDATE_INCOMPATIBLE')) {
+      step('Tanda tangan berbeda dari versi terpasang, mencopot yang lama dulu')
+      runExe(adb, ['-s', target, 'uninstall', appId])
+      runExe(adb, ['-s', target, 'install', apk])
+    } else if (install.status !== 0) {
+      fail(`Pemasangan gagal:\n${output.trim()}`)
+    }
+
+    step('Membuka aplikasi')
+    runExe(adb, ['-s', target, 'shell', 'am', 'start', '-n', `${appId}/.MainActivity`])
+    console.log('\n  Siap. Versi release, tertandatangani kuncimu sendiri.\n')
+  } else {
+    console.log(
+      '  Salin berkas itu ke HP lalu buka dari sana. Android akan meminta izin\n' +
+        '  memasang dari sumber tidak dikenal; itu wajar untuk pemasangan langsung.\n',
+    )
+  }
+} else {
+  step('Membuka aplikasi')
+  runExe(adb, ['-s', target, 'shell', 'am', 'start', '-n', `${appId}/.MainActivity`])
+
+  console.log(
+    mode === 'live'
+      ? '\n  Siap. Ubah kode, tampilan di HP ikut berubah tanpa build ulang.\n' +
+          '  Kalau HP kehilangan sambungan, ulangi perintah ini.\n'
+      : '\n  Siap. Aplikasi berjalan dari aset yang terbungkus, tanpa perlu komputer.\n',
+  )
+}

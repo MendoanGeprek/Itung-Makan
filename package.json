@@ -14,7 +14,8 @@
     "android:open": "cap open android",
     "android:icons": "capacitor-assets generate --android --androidProject android",
     "android:run": "node scripts/android.mjs run",
-    "android:live": "node scripts/android.mjs live"
+    "android:live": "node scripts/android.mjs live",
+    "android:release": "node scripts/android.mjs release"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.0",
