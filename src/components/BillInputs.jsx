@@ -29,7 +29,7 @@ export default function BillInputs({ grossTotal, netPaid, onGrossChange, onNetCh
         <Field
           id="net-paid"
           label="Total Setelah Diskon"
-          hint="Uang yang benar-benar keluar dari rekening setelah semua promo."
+          hint="Total harga setelah dipotong diskon."
           value={netPaid}
           onChange={onNetChange}
         />
