@@ -24,14 +24,16 @@ describe('render awal', () => {
   it('menampilkan form tanpa crash', () => {
     const html = render(<App />)
     expect(html).toContain('Total Sebelum Diskon')
-    expect(html).toContain('Total Dibayar')
+    expect(html).toContain('Total Setelah Diskon')
     expect(html).toContain('User A')
     expect(html).toContain('User B')
     expect(html).toContain('Hitung Patungan')
   })
 
   it('belum menampilkan hasil sebelum dihitung', () => {
-    expect(render(<App />)).not.toContain('siap transfer')
+    const html = render(<App />)
+    expect(html).not.toContain('Rincian Patungan')
+    expect(html).not.toContain('Jumlah pas')
   })
 })
 
@@ -40,7 +42,7 @@ describe('hasil sampai ke layar', () => {
     const html = render(<ResultsTable result={vector()} payerId="" />)
     expect(html).toContain('Rp 62.500')
     expect(html).toContain('Rp 27.500')
-    expect(html).toContain('cocok dengan total dibayar')
+    expect(html).toContain('cocok dengan total setelah diskon')
   })
 
   it('menandai si penalang sebagai penerima, bukan pengirim', () => {

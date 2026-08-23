@@ -1,155 +1,123 @@
 import { formatRupiah } from '../lib/format'
+import { LeaderLine, Rule, SectionTitle } from './receipt'
 
-function MethodCard({ title, description, active, onSelect, children }) {
+function MethodBlock({ title, description, active, onSelect, rows, amountOf }) {
   return (
-    <div
-      className={`rounded-xl border p-4 transition ${
-        active
-          ? 'border-indigo-400 bg-indigo-50/60 dark:border-indigo-500 dark:bg-indigo-950/30'
-          : 'border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900/40'
-      }`}
-    >
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <h3 className="font-semibold text-slate-900 dark:text-slate-100">{title}</h3>
-          <p className="mt-1 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
-            {description}
-          </p>
-        </div>
+    <div className={`py-3 ${active ? '' : 'opacity-70'}`}>
+      <div className="flex items-baseline justify-between gap-2">
+        <h3 className="text-sm font-bold">
+          {active ? '[x] ' : '[ ] '}
+          {title}
+        </h3>
         {active ? (
-          <span className="shrink-0 rounded-full bg-indigo-600 px-2.5 py-1 text-[11px] font-semibold text-white">
-            dipakai
-          </span>
+          <span className="text-faint shrink-0 text-[10px] tracking-wider uppercase">dipakai</span>
         ) : (
           <button
             type="button"
             onClick={onSelect}
-            className="shrink-0 rounded-full border border-slate-300 px-2.5 py-1 text-[11px] font-semibold text-slate-600 transition hover:border-indigo-400 hover:text-indigo-600 dark:border-slate-600 dark:text-slate-300 dark:hover:border-indigo-500 dark:hover:text-indigo-400"
+            className="border-edge text-faint hover:text-ink shrink-0 rounded border px-2 py-0.5 text-[10px] font-semibold tracking-wider uppercase transition"
           >
             pakai ini
           </button>
         )}
       </div>
-      <dl className="mt-3 space-y-1.5">{children}</dl>
-    </div>
-  )
-}
 
-function Line({ name, amount }) {
-  return (
-    <div className="flex items-baseline justify-between gap-3 text-sm">
-      <dt className="truncate text-slate-600 dark:text-slate-300">{name}</dt>
-      <dd className="font-semibold text-slate-900 tabular-nums dark:text-slate-100">
-        {formatRupiah(amount)}
-      </dd>
+      <p className="text-faint mt-1 text-[11px] leading-relaxed">{description}</p>
+
+      <div className="mt-2 space-y-1 text-[11px]">
+        {rows.map((row) => (
+          <LeaderLine key={row.id} label={row.name} value={formatRupiah(amountOf(row))} />
+        ))}
+      </div>
     </div>
   )
 }
 
 export default function ComparisonPanel({ result, open, onToggle, onMethodChange }) {
-  const biggestGap = result.rows.reduce(
-    (max, row) => Math.max(max, Math.abs(row.delta)),
-    0,
-  )
+  const biggestGap = result.rows.reduce((max, row) => Math.max(max, Math.abs(row.delta)), 0)
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900/60">
+    <section>
       <button
         type="button"
         onClick={onToggle}
         aria-expanded={open}
-        className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left transition hover:bg-slate-50 dark:hover:bg-slate-800/40"
+        className="w-full text-left transition hover:opacity-70"
       >
-        <div>
-          <h2 className="text-sm font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400">
-            Bandingkan cara bagi biaya tambahan
-          </h2>
-          <p className="mt-0.5 text-sm text-slate-600 dark:text-slate-300">
-            Selisih terbesar antar metode{' '}
-            <span className="font-semibold tabular-nums text-slate-900 dark:text-slate-100">
-              {formatRupiah(biggestGap)}
-            </span>
-          </p>
-        </div>
-        <svg
-          viewBox="0 0 20 20"
-          fill="currentColor"
-          aria-hidden="true"
-          className={`h-5 w-5 shrink-0 text-slate-400 transition-transform ${open ? 'rotate-180' : ''}`}
-        >
-          <path
-            fillRule="evenodd"
-            d="M5.3 7.3a1 1 0 0 1 1.4 0L10 10.6l3.3-3.3a1 1 0 1 1 1.4 1.4l-4 4a1 1 0 0 1-1.4 0l-4-4a1 1 0 0 1 0-1.4Z"
-            clipRule="evenodd"
-          />
-        </svg>
+        <SectionTitle>Cara Bagi Biaya Tambahan</SectionTitle>
+        <p className="text-faint pb-3 text-center text-[11px]">
+          selisih terbesar {formatRupiah(biggestGap)}
+          <span className="ml-2 tracking-wider uppercase">
+            [{open ? 'tutup' : 'lihat'}]
+          </span>
+        </p>
       </button>
 
       {open && (
-        <div className="space-y-4 border-t border-slate-100 px-5 py-4 dark:border-slate-800">
-          <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+        <>
+          <Rule />
+
+          <p className="text-faint py-3 text-[11px] leading-relaxed">
             Harga makanan selalu dibagi proporsional. Yang bisa diperdebatkan cuma{' '}
-            <span className="font-semibold text-slate-900 dark:text-slate-100">
+            <span className="text-ink font-bold tabular-nums">
               {formatRupiah(result.extraFees)}
             </span>{' '}
-            biaya tambahan — ongkir dan biaya layanan tidak ikut naik gara-gara ada yang pesan lebih
-            banyak.
+            biaya tambahan, karena ongkir dan biaya layanan tidak ikut naik gara-gara ada yang
+            pesan lebih banyak.
           </p>
 
-          <div className="grid gap-3 sm:grid-cols-2">
-            <MethodCard
-              title="50/50"
-              description="Biaya tambahan dibagi rata. Ongkir satu motor sama saja berapa pun isinya."
-              active={result.method === 'even'}
-              onSelect={() => onMethodChange('even')}
-            >
-              {result.rows.map((row) => (
-                <Line key={row.id} name={row.name} amount={row.exactEven} />
-              ))}
-            </MethodCard>
+          <Rule />
 
-            <MethodCard
-              title="Proporsional Penuh"
-              description="Biaya tambahan ikut bobot pesanan. Yang pesan lebih banyak bayar ongkir lebih besar."
-              active={result.method === 'proportional'}
-              onSelect={() => onMethodChange('proportional')}
-            >
-              {result.rows.map((row) => (
-                <Line key={row.id} name={row.name} amount={row.exactProportional} />
-              ))}
-            </MethodCard>
-          </div>
+          <MethodBlock
+            title="50/50"
+            description="Dibagi rata. Ongkir satu motor sama saja berapa pun isinya."
+            active={result.method === 'even'}
+            onSelect={() => onMethodChange('even')}
+            rows={result.rows}
+            amountOf={(row) => row.exactEven}
+          />
 
-          <div className="rounded-xl bg-slate-50 px-4 py-3 dark:bg-slate-800/50">
-            <p className="text-[11px] font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+          <Rule />
+
+          <MethodBlock
+            title="Proporsional Penuh"
+            description="Ikut bobot pesanan. Yang pesan lebih banyak bayar ongkir lebih besar."
+            active={result.method === 'proportional'}
+            onSelect={() => onMethodChange('proportional')}
+            rows={result.rows}
+            amountOf={(row) => row.exactProportional}
+          />
+
+          <Rule />
+
+          <div className="py-3">
+            <p className="text-faint text-[10px] tracking-wider uppercase">
               Selisih kalau pindah ke proporsional
             </p>
-            <ul className="mt-2 space-y-1">
+            <div className="mt-2 space-y-1 text-[11px]">
               {result.rows.map((row) => {
-                const sign = row.delta > 0 ? '+' : row.delta < 0 ? '−' : ''
+                const sign = row.delta > 0.5 ? '+' : row.delta < -0.5 ? '-' : ''
                 const tone =
                   row.delta > 0.5
-                    ? 'text-rose-600 dark:text-rose-400'
+                    ? 'text-red-600 dark:text-red-400'
                     : row.delta < -0.5
                       ? 'text-emerald-600 dark:text-emerald-400'
-                      : 'text-slate-500 dark:text-slate-400'
+                      : ''
 
                 return (
-                  <li
-                    key={row.id}
-                    className="flex items-baseline justify-between gap-3 text-sm"
-                  >
-                    <span className="truncate text-slate-600 dark:text-slate-300">{row.name}</span>
-                    <span className={`font-semibold tabular-nums ${tone}`}>
+                  <div key={row.id} className="flex items-baseline gap-1.5">
+                    <span className="shrink-0 truncate">{row.name}</span>
+                    <span className="leader" aria-hidden="true" />
+                    <span className={`shrink-0 font-bold tabular-nums ${tone}`}>
                       {sign}
                       {formatRupiah(Math.abs(row.delta))}
                     </span>
-                  </li>
+                  </div>
                 )
               })}
-            </ul>
+            </div>
           </div>
-        </div>
+        </>
       )}
     </section>
   )

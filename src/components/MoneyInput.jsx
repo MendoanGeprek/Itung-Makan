@@ -13,8 +13,8 @@ export default function MoneyInput({
   className = '',
 }) {
   return (
-    <div className={`relative ${className}`}>
-      <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm font-medium text-slate-400 dark:text-slate-500">
+    <div className={`group relative ${className}`}>
+      <span className="text-faint pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-xs font-semibold">
         Rp
       </span>
       <input
@@ -27,7 +27,7 @@ export default function MoneyInput({
         placeholder={placeholder}
         onChange={(event) => onChange(parseRupiah(event.target.value))}
         onFocus={(event) => event.target.select()}
-        className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-3 text-right text-base font-semibold tabular-nums text-slate-900 shadow-sm transition outline-none placeholder:font-normal placeholder:text-slate-300 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-600 dark:focus:border-indigo-500"
+        className="bg-field border-edge text-ink placeholder:text-faint/60 w-full rounded border py-2.5 pr-3 pl-9 text-right text-base font-bold tabular-nums transition outline-none focus:border-stone-500 focus:ring-1 focus:ring-stone-500/40"
       />
     </div>
   )
